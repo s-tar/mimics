@@ -1,0 +1,31 @@
+containers:
+  webpack-container:
+    setup:
+    - !Alpine v3.6
+    - !Repo edge/main
+    - !Install [nodejs-npm>=6.10.3-r0,
+        make, gcc, g++, python, linux-headers, udev # need them for node-gyp
+      ]
+    - !EnsureDir /work/node_modules
+    - !EnsureDir /usr/lib/node_modules/.cache
+    - !NpmDependencies
+      package: true
+      dev: true
+    environ:
+      NODE_PATH: /usr/lib/node_modules
+commands:
+  webpack: !Command
+    description: Run webpack
+    container: webpack-container
+    volumes: &node_modules
+      /work/node_modules: !BindRW /vagga/root/usr/lib/node_modules
+      /usr/lib/node_modules/.cache: !Persistent node_cache
+    options: |
+      Usage:
+        vagga webpack [-w]
+
+      Options:
+        --watch, -w          enable webpack watch
+    run: |
+      touch /usr/lib/node_modules/.cache
+      node --max_old_space_size=4096 /usr/lib/node_modules/webpack/bin/webpack.js --progress --colors ${VAGGAOPT_WATCH:+--watch}

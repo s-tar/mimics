@@ -29,7 +29,7 @@ We could send any events to self or to other `MimicComponent`. It has few method
 - `update(props)` - shortcut for `communicator.update(props)`.
 - `send(event, payload)` - shortcut for `communicator.send(event, payload)`.
 
-Also it provides `@on(event, filterFn)` decorator to bind callbacks to our events.
+Also it provides `@on(event, streamModifier)` decorator to bind callbacks to our events.
 `comunicator`,`currentState` and `payload` will be passed to callback function afted event will be triggered.
 
 
@@ -69,8 +69,8 @@ import { MimicComponent, on } from 'mimics';
 
 class SimpleDispatcher {
     @on('onIncrement')
-    static onIncrement(communicator, state) {
-        communicator.update({ count: state.count + 1 });
+    static onIncrement(communicator, state, payload) {
+        communicator.update({ count: state.count + payload.delta });
     }
 }
 ```
@@ -91,7 +91,7 @@ class SimpleComponent extends React.Component {
     }
 
     onIncrement() {
-        this.send('onIncrement');
+        this.send('onIncrement', { delta: 1 });
     }
 
     render () {
@@ -102,6 +102,39 @@ class SimpleComponent extends React.Component {
     }
 }
 ```
+
+# Events sending
+
+By default `communicator.send()` is sending events to the same component where it was called.
+But what if we want to say "hello" to others?
+Let's take a look on how our `SimpleComponent` can do that:
+- `this.communicator.group('friends').send('hello')` - will send event to all `SimpleComponent` in group "**friends**". You could set group by passing property `mimicGroup`.
+- `this.communicator.component(SomeOtherComponent).send('hello')` - will send event to all `SomeOtherComponent`.
+- `this.communicator.allComponents().send('hello')` - will send event to **all** `MimicComponent`.
+
+Also you could combine those options by chaining:
+- `this.communicator.component(SomeOtherComponent).group('friends').send('hello')`
+- `this.communicator.group('friends').allComponents().send('hello')`
+- etc
+
+# Events listening
+
+We already know that we could listen to events with `on` decorator.
+By default we are listening events intended to components of the same class (in our example `SimpleComponent`).
+
+But what to do if we have `SpyComponent` which have to know what `EnemyComponent` is sending?
+For that we could pass `streamModifier` function to `on` decorator:
+
+```
+@on(
+    'message',
+    (stream) => strem.filter(({ to: { component }}) => component === SpyComponent.origin)
+)
+...
+```
+`stream` is a RxJS stream, which you could modify in different ways. See more in [RxJS Documentation](http://reactivex.io/rxjs/manual/index.html).
+
+Notice that prototype of all mimic components is `MimicComponent`, so to get origin prototype use `origin` property.
 
 
 # Authors

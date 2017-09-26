@@ -44,8 +44,8 @@ class SimpleComponent extends React.Component {
         this.onIncrement = this.onIncrement.bind(this);
     }
 
-    defaultProps = {
-        counter: 0,
+    static defaultProps = {
+        count: 0,
     }
 
     onIncrement() {
@@ -86,8 +86,8 @@ class SimpleComponent extends React.Component {
         this.onIncrement = this.onIncrement.bind(this);
     }
 
-    defaultProps = {
-        counter: 0,
+    static defaultProps = {
+        count: 0,
     }
 
     onIncrement() {

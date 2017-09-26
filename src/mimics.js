@@ -113,7 +113,6 @@ function MimicComponentDecorator(Component) {
                     }
                 });
             }
-
             this.state = { ...Component.defaultProps, ...this.props };
             this.origin = Component;
             this.mimicId = getNextId();
@@ -123,10 +122,16 @@ function MimicComponentDecorator(Component) {
                 this.origin,
                 this.update.bind(this),
             );
+
+            this.communicator.send('init');
         }
 
         update(props) {
             this.setState(props);
+        }
+
+        componentWillReceiveProps(props) {
+            this.communicator.send('outerUpdate', props);
         }
 
         render() {

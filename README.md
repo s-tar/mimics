@@ -137,6 +137,10 @@ For that we could pass `streamModifier` function to `on` decorator:
 Notice that prototype of all mimic components is `MimicComponent`, so to get origin prototype use `origin` property.
 
 
+### There are few reserved events:
+- `init` - is called on component creation.
+- `outerUpdate` - is called when parent updates component's props.
+
 # Authors
 For the moment there is only one author but who knows, maybe there will be more :)
 

@@ -27,7 +27,7 @@ export class SimpleComponent extends React.Component {
 
     @autobind
     onClick() {
-        this.communicator.send('onIncrement', { message: 'Example #2 SimpleComponent envent triggered' });
+        this.send('onIncrement', { message: 'Example #2 SimpleComponent envent triggered' });
         // or
         // this.communicator.send('onIncrement', { message: 'Example #2 SimpleComponent envent triggered' });
     }

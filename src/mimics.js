@@ -130,8 +130,12 @@ function MimicComponentDecorator(Component) {
             this.setState(props);
         }
 
-        componentWillReceiveProps(props) {
-            this.communicator.send('outerUpdate', props);
+        componentWillReceiveProps(nextProps) {
+            this.communicator.send('outerUpdate', nextProps);
+        }
+
+        shouldComponentUpdate(nextProps, nextState) {
+            return nextState !== this.state;
         }
 
         render() {

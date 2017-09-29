@@ -83,7 +83,21 @@ function MimicComponentDecorator(Component) {
 
         constructor(props, ...args) {
             super(props, ...args);
+
             const Dispatcher = Component.dispatcher;
+            this.subscriptions = [];
+            this.state = { ...Component.defaultProps, ...this.props };
+            this.origin = Component;
+            this.mimicId = getNextId();
+            this.mimicGroup = props.mimicGroup;
+            this.communicator = new MimicCommunicator(
+                this.mimicId,
+                this.origin,
+                this.update.bind(this),
+            );
+
+            this.communicator.send('init');
+
             if (Dispatcher) {
                 const events = Dispatcher.events || Dispatcher.prototype.events || {};
                 Object.keys(events).forEach((key) => {
@@ -102,28 +116,17 @@ function MimicComponentDecorator(Component) {
                             );
                         }
 
-                        modifiedStream.subscribe((data) => {
+                        this.subscriptions.push(modifiedStream.subscribe((data) => {
                             func(
                                 this.communicator,
                                 { ...this.state },
                                 data.payload,
                                 data
                             );
-                        });
+                        }));
                     }
                 });
             }
-            this.state = { ...Component.defaultProps, ...this.props };
-            this.origin = Component;
-            this.mimicId = getNextId();
-            this.mimicGroup = props.mimicGroup;
-            this.communicator = new MimicCommunicator(
-                this.mimicId,
-                this.origin,
-                this.update.bind(this),
-            );
-
-            this.communicator.send('init');
         }
 
         update(props) {
@@ -136,6 +139,10 @@ function MimicComponentDecorator(Component) {
 
         shouldComponentUpdate(nextProps, nextState) {
             return nextState !== this.state;
+        }
+
+        componentWillUnmount() {
+            this.subscriptions.forEach((subscription) => subscription.unsubscribe());
         }
 
         render() {

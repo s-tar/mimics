@@ -1,6 +1,6 @@
 # Mimics
 
-React HOC (Higher-Order Component) which provides easy way to manage state and adds posibility to communicate with other components via RxJS.
+React HOC (Higher-Order Component) which provides easy way to manage state and adds possibility to communicate with other components via RxJS.
 
 # Usage
 
